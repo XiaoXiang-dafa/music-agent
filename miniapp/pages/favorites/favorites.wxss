@@ -1,0 +1,104 @@
+/* ============================================
+   收藏/历史 — 微信风格
+   ============================================ */
+
+.container {
+  display: flex; flex-direction: column; height: 100%;
+  background: var(--color-bg);
+  overflow-x: hidden;
+}
+
+/* ===== Tab ===== */
+.tab-bar {
+  display: flex; background: var(--color-surface);
+  border-bottom: 0.5px solid var(--color-border-light);
+  flex-shrink: 0;
+}
+.tab-item {
+  flex: 1; text-align: center; padding: var(--space-2) 0;
+  font-size: var(--text-base); color: var(--color-text-secondary);
+  border-bottom: 4rpx solid transparent;
+  transition: all var(--duration-normal);
+}
+.tab-item.active {
+  color: var(--color-accent); border-bottom-color: var(--color-accent);
+}
+
+/* 历史头部 */
+.history-header {
+  display: flex; justify-content: flex-end;
+  padding: var(--space-1) var(--space-3);
+}
+.clear-btn { font-size: var(--text-sm); color: var(--color-danger); padding: var(--space-1); }
+
+/* 列表 */
+.list-area { flex: 1; min-height: 0; overflow-y: auto; padding-bottom: 160rpx; }
+.bottom-area {
+  flex-shrink: 0;
+  width: 100%; max-width: 100vw;
+}
+
+/* 空状态 */
+.empty-wrap {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 160rpx 0; gap: var(--space-2);
+}
+.empty-icon { font-size: 80rpx; }
+.empty-text { font-size: var(--text-base); color: var(--color-text-secondary); }
+.empty-hint { font-size: var(--text-sm); color: var(--color-text-muted); }
+
+/* ===== 歌曲列表 ===== */
+.song-item {
+  display: flex; align-items: center; gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 0.5px solid var(--color-border-light);
+  background: var(--color-surface);
+  width: 100%; box-sizing: border-box; max-width: 100vw;
+}
+.song-item:active { background: var(--color-bg); }
+.song-cover {
+  width: 88rpx; height: 88rpx; border-radius: var(--radius-sm);
+  background: var(--color-bg); flex-shrink: 0;
+}
+.song-info { flex: 1; min-width: 0; }
+.song-info .song-name {
+  font-size: var(--text-base); color: var(--color-text);
+  display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.song-info .song-artist {
+  font-size: var(--text-xs); color: var(--color-text-secondary);
+  display: block; margin-top: 2rpx;
+}
+.song-ops { display: flex; gap: var(--space-2); flex-shrink: 0; }
+.op-btn {
+  width: var(--touch-sm); height: var(--touch-sm); border-radius: 50%;
+  background: var(--color-accent-light); color: var(--color-accent);
+  display: flex; align-items: center; justify-content: center;
+  font-size: var(--text-base); font-weight: 600;
+}
+.op-btn:active { background: var(--color-accent-active); }
+.fav-btn { background: var(--color-danger-light); color: var(--color-danger); }
+
+/* ===== 收藏页放大版迷你播放栏 ===== */
+.bottom-area-large .mini-player {
+  padding: var(--space-2) var(--space-3);
+  gap: 16rpx;
+}
+.bottom-area-large .mini-cover {
+  width: 100rpx; height: 100rpx; border-radius: var(--radius-sm);
+}
+.bottom-area-large .mini-name { font-size: 30rpx; }
+.bottom-area-large .mini-artist { font-size: 26rpx; }
+.bottom-area-large .mini-fav,
+.bottom-area-large .mini-ctrl {
+  width: 64rpx; height: 64rpx;
+}
+.bottom-area-large .mini-fav { font-size: 36rpx; }
+.bottom-area-large .geo-bar-v { width: 5rpx; height: 26rpx; }
+.bottom-area-large .geo-tri-left,
+.bottom-area-large .geo-tri-right { border-top-width: 12rpx; border-bottom-width: 12rpx; }
+.bottom-area-large .geo-tri-left { border-right-width: 20rpx; }
+.bottom-area-large .geo-tri-right { border-left-width: 20rpx; }
+.bottom-area-large .geo-tri-play { border-top-width: 18rpx; border-bottom-width: 18rpx; border-left-width: 30rpx; }
+.bottom-area-large .geo-bar-pause { width: 10rpx; height: 32rpx; }
+.bottom-area-large .geo-bar-h { width: 30rpx; height: 4rpx; }

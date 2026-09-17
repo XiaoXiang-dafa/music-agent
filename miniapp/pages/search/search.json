@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "搜索歌曲",
+  "usingComponents": {
+    "mini-player": "/components/mini-player/mini-player",
+    "queue-panel": "/components/queue-panel/queue-panel"
+  }
+}

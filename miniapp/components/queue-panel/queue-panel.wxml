@@ -1,0 +1,26 @@
+<view class="queue-overlay {{show ? 'show' : ''}}" bindtap="hide" catchtouchmove="preventScroll"></view>
+<view class="queue-panel {{show ? 'show' : ''}}" catchtouchmove="preventScroll">
+  <view class="queue-handle"></view>
+  <view class="queue-header">
+    <text class="queue-title">播放队列 ({{queueLength}})</text>
+    <view class="queue-header-right">
+      <text class="queue-mode" bindtap="cycleMode">{{modeIcon}}</text>
+      <text class="queue-clear" bindtap="clearQueue">清空</text>
+    </view>
+  </view>
+  <scroll-view class="queue-list" scroll-y>
+    <view class="queue-item {{index === queueIndex ? 'active' : ''}}"
+          wx:for="{{playQueue}}" wx:key="id"
+          data-index="{{index}}" bindtap="playFromQueue">
+      <image class="queue-cover-small" src="{{item.cover || '/images/default-cover.png'}}" mode="aspectFill" binderror="onCoverError" data-index="{{index}}" />
+      <view class="queue-item-info">
+        <text class="queue-item-name {{index === queueIndex ? 'playing' : ''}}">{{item.name}}</text>
+        <text class="queue-item-artist">{{item.artist}}</text>
+      </view>
+      <text class="queue-item-del" data-index="{{index}}" catchtap="removeFromQueue">✕</text>
+    </view>
+    <view class="queue-empty" wx:if="{{playQueue.length === 0}}">
+      <text>队列为空</text>
+    </view>
+  </scroll-view>
+</view>

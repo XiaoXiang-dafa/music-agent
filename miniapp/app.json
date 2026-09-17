@@ -1,0 +1,16 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/search/search",
+    "pages/player/player",
+    "pages/favorites/favorites"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#0a0a0f",
+    "navigationBarTitleText": "小祥大发",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#0a0a0f"
+  },
+  "requiredBackgroundModes": ["audio"],
+  "style": "v2"
+}

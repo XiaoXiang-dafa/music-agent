@@ -1,0 +1,215 @@
+/* ============================================
+   聊天主页 — 微信聊天风格
+   ============================================ */
+
+.container {
+  display: flex; flex-direction: column; height: 100%;
+  background: var(--color-bg);
+  overflow-x: hidden;
+}
+
+/* ===== 聊天区 ===== */
+.chat-area {
+  flex: 1; min-height: 0; padding: var(--space-2) 0 var(--space-2) 0;
+  overflow-y: auto;
+  /* 微信聊天背景有细微纹理，这里用纯色保持清爽 */
+}
+
+/* ===== 消息行 ===== */
+.msg-row {
+  display: flex; margin-bottom: var(--space-2);
+  padding-left: var(--space-3); padding-right: var(--space-3);
+  box-sizing: border-box;
+}
+.user-row { justify-content: flex-end; align-items: flex-start; }
+.bot-row { align-items: flex-start; }
+.msg-bubble-wrap { max-width: 75%; padding-top: 12rpx; }
+
+/* 头像 */
+.bot-avatar-wrap { flex-shrink: 0; margin-right: 30rpx; }
+.bot-avatar {
+  width: 80rpx; height: 80rpx; border-radius: var(--radius-md);
+}
+.user-avatar-wrap { flex-shrink: 0; margin-left: 30rpx; }
+.user-avatar {
+  width: 80rpx; height: 80rpx; border-radius: var(--radius-md);
+  display: block; overflow: hidden;
+}
+
+.bot-name {
+  font-size: 26rpx; color: var(--color-text-secondary);
+  margin-top: -8rpx; margin-bottom: var(--space-1);
+  padding-left: var(--space-1); display: block;
+}
+
+/* ===== 气泡 — 模仿微信 ===== */
+.msg {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-bubble);
+  font-size: var(--text-base); line-height: 1.5; word-break: break-word;
+  position: relative;
+}
+/* 发送方 — 微信绿，右侧三角箭头 */
+.msg.user {
+  background: var(--color-bubble-sent); color: #1A1A1A;
+  border-radius: var(--radius-bubble) 4rpx var(--radius-bubble) var(--radius-bubble);
+}
+.msg.user::after {
+  content: ''; position: absolute;
+  right: -10rpx; top: 24rpx;
+  border-width: 10rpx 0 10rpx 12rpx; border-style: solid;
+  border-color: transparent transparent transparent var(--color-bubble-sent);
+}
+/* 接收方 — 白色，左侧三角箭头 */
+.msg.bot {
+  background: var(--color-bubble-received); color: var(--color-text);
+  border: 0.5px solid var(--color-border-light);
+  border-radius: 4rpx var(--radius-bubble) var(--radius-bubble) var(--radius-bubble);
+}
+.msg.bot::before {
+  content: ''; position: absolute;
+  left: -11rpx; top: 24rpx;
+  border-width: 10rpx 12rpx 10rpx 0; border-style: solid;
+  border-color: transparent var(--color-border-light) transparent transparent;
+}
+.msg.bot::after {
+  content: ''; position: absolute;
+  left: -9rpx; top: 24rpx;
+  border-width: 10rpx 12rpx 10rpx 0; border-style: solid;
+  border-color: transparent var(--color-bubble-received) transparent transparent;
+}
+.msg-text { white-space: pre-wrap; }
+
+/* ===== 歌单卡片 — 嵌入气泡内的卡片 ===== */
+.music-card {
+  margin-top: var(--space-1); padding: var(--space-2);
+  background: var(--color-bg); border-radius: var(--radius-md);
+}
+.card-title {
+  font-size: var(--text-xs); color: var(--color-text-secondary);
+  margin-bottom: var(--space-1); display: block;
+}
+.song-row {
+  padding: var(--space-1) 0;
+  border-bottom: 0.5px solid var(--color-border-light);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.song-row:last-child { border-bottom: none; padding-bottom: 0; }
+.song-info { flex: 1; min-width: 0; }
+.song-name {
+  font-size: var(--text-sm); color: var(--color-text);
+  display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.song-reason {
+  font-size: var(--text-xs); color: var(--color-text-secondary);
+  line-height: 1.4; margin-top: 2rpx; display: block;
+}
+.song-actions {
+  display: flex; gap: var(--space-2); flex-shrink: 0; margin-left: var(--space-2);
+}
+.song-act-btn {
+  width: var(--touch-sm); height: var(--touch-sm); border-radius: 50%;
+  background: var(--color-accent-light); color: var(--color-accent);
+  display: flex; align-items: center; justify-content: center;
+  font-size: var(--text-base); font-weight: 600;
+}
+.song-act-btn:active { background: var(--color-accent-active); }
+
+/* ===== 输入栏 — 微信风格 ===== */
+.input-bar {
+  display: flex; align-items: center; gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  background: var(--color-input-bar); flex-shrink: 0;
+  border-top: 0.5px solid var(--color-border);
+  padding-bottom: calc(var(--space-1) + constant(safe-area-inset-bottom));
+  padding-bottom: calc(var(--space-1) + env(safe-area-inset-bottom));
+}
+.plus-btn {
+  width: var(--touch-sm); height: var(--touch-sm); border-radius: 50%; flex-shrink: 0;
+  background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  transition: background var(--duration-fast);
+}
+.plus-btn:active, .plus-btn.active { background: var(--color-border); }
+.plus-icon { font-size: var(--text-xl); color: var(--color-text-secondary); font-weight: 300; }
+.msg-input {
+  flex: 1; min-width: 0; background: var(--color-surface); color: var(--color-text);
+  border-radius: var(--radius-full); padding: 0 var(--space-2);
+  font-size: var(--text-base); border: 0.5px solid var(--color-border);
+  height: 68rpx; line-height: 68rpx;
+}
+
+/* ===== 底部 mini-player 上方不要有割裂感 ===== */
+.bottom-area { flex-shrink: 0; }
+
+/* ===== "+" 弹出菜单 ===== */
+.menu-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.3); z-index: 90;
+  opacity: 0; pointer-events: none;
+  transition: opacity var(--duration-normal);
+}
+.menu-overlay.show { opacity: 1; pointer-events: auto; }
+.menu-panel {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 100;
+  background: var(--color-surface); border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  padding: var(--space-4) var(--space-3);
+  transform: translateY(100%);
+  transition: transform 280ms var(--ease-out);
+  padding-bottom: calc(var(--space-4) + constant(safe-area-inset-bottom));
+  padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
+}
+.menu-panel.show { transform: translateY(0); }
+.menu-title {
+  font-size: var(--text-sm); color: var(--color-text-secondary);
+  display: block; text-align: center; margin-bottom: var(--space-4);
+}
+.menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-3); }
+.menu-item {
+  display: flex; flex-direction: column; align-items: center;
+  padding: var(--space-3) 0; border-radius: var(--radius-md);
+  background: var(--color-input-bar);
+}
+.menu-item:active { background: var(--color-border); }
+.menu-emoji { font-size: 52rpx; margin-bottom: var(--space-1); }
+.menu-label { font-size: var(--text-xs); color: var(--color-text-secondary); }
+
+/* ===== 用户头像覆盖按钮 ===== */
+.user-avatar-wrap { position: relative; }
+.avatar-choose-btn {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  padding: 0; margin: 0; border: none; background: transparent;
+  opacity: 0;
+}
+.avatar-choose-btn::after { border: none; }
+.user-avatar-placeholder {
+  display: flex; align-items: center; justify-content: center;
+  width: 80rpx; height: 80rpx;
+  background: var(--color-border);
+  font-size: 20rpx; color: var(--color-text-secondary);
+  border-radius: var(--radius-md);
+}
+
+/* ===== 放大版迷你播放栏（与收藏页一致） ===== */
+.bottom-area-large .mini-player {
+  padding: var(--space-2) var(--space-3);
+  gap: 16rpx;
+}
+.bottom-area-large .mini-cover {
+  width: 100rpx; height: 100rpx; border-radius: var(--radius-sm);
+}
+.bottom-area-large .mini-name { font-size: 30rpx; }
+.bottom-area-large .mini-artist { font-size: 26rpx; }
+.bottom-area-large .mini-fav,
+.bottom-area-large .mini-ctrl {
+  width: 64rpx; height: 64rpx;
+}
+.bottom-area-large .mini-fav { font-size: 36rpx; }
+.bottom-area-large .geo-bar-v { width: 5rpx; height: 26rpx; }
+.bottom-area-large .geo-tri-left,
+.bottom-area-large .geo-tri-right { border-top-width: 12rpx; border-bottom-width: 12rpx; }
+.bottom-area-large .geo-tri-left { border-right-width: 20rpx; }
+.bottom-area-large .geo-tri-right { border-left-width: 20rpx; }
+.bottom-area-large .geo-tri-play { border-top-width: 18rpx; border-bottom-width: 18rpx; border-left-width: 30rpx; }
+.bottom-area-large .geo-bar-pause { width: 10rpx; height: 32rpx; }
+.bottom-area-large .geo-bar-h { width: 30rpx; height: 4rpx; }

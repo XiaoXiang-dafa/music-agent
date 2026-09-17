@@ -1,0 +1,80 @@
+<page-meta page-style="{{_scrollLock ? 'overflow: hidden;' : ''}}"></page-meta>
+<!-- 聊天主页 -->
+<view class="container">
+  <!-- 聊天区 -->
+  <scroll-view class="chat-area" scroll-y scroll-with-animation scroll-into-view="msg-{{messages.length-1}}">
+    <block wx:for="{{messages}}" wx:key="index">
+      <!-- 用户消息（右侧绿色 + 头像） -->
+      <view wx:if="{{item.role === 'user'}}" class="msg-row user-row" id="msg-{{index}}">
+        <view class="msg-bubble-wrap user-wrap">
+          <view class="msg user">
+            <text class="msg-text">{{item.content}}</text>
+          </view>
+        </view>
+        <view class="user-avatar-wrap">
+          <image wx:if="{{avatarUser}}" class="user-avatar" src="{{avatarUser}}" mode="aspectFill" />
+          <text wx:else class="user-avatar-placeholder">头像</text>
+          <button class="avatar-choose-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar"></button>
+        </view>
+      </view>
+
+      <!-- AI 消息（左侧 + 头像+名字） -->
+      <view wx:if="{{item.role === 'bot'}}" class="msg-row bot-row" id="msg-{{index}}">
+        <view class="bot-avatar-wrap">
+          <image class="bot-avatar" src="{{avatarBot}}" mode="aspectFill" />
+        </view>
+        <view class="msg-bubble-wrap bot-wrap">
+          <text class="bot-name">小祥大发</text>
+          <view class="msg bot">
+            <text class="msg-text">{{item.content}}</text>
+            <view class="music-card" wx:if="{{item.songs && item.songs.length > 0}}">
+              <text class="card-title">🎧 今日歌单</text>
+              <view class="song-row" wx:for="{{item.songs}}" wx:key="name" wx:for-item="s">
+                <view class="song-info" data-name="{{s.name}}" data-artist="{{s.artist}}" bindtap="goPlayerFromCard">
+                  <text class="song-name">{{s.name}} - {{s.artist || ''}}</text>
+                  <text class="song-reason" wx:if="{{s.reason}}">{{s.reason}}</text>
+                </view>
+                <view class="song-actions">
+                  <text class="song-act-btn" data-name="{{s.name}}" data-artist="{{s.artist}}" catchtap="playFromCard">▶</text>
+                  <text class="song-act-btn queue-btn" data-name="{{s.name}}" data-artist="{{s.artist}}" catchtap="addToQueue">+</text>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </block>
+  </scroll-view>
+
+  <!-- 底部区域（迷你栏+输入框）固定不挤压聊天 -->
+  <view class="bottom-area bottom-area-large">
+    <mini-player />
+    <view class="input-bar">
+    <view class="plus-btn {{showMenu ? 'active' : ''}}" bindtap="toggleMenu">
+      <text class="plus-icon">{{showMenu ? '✕' : '+'}}</text>
+    </view>
+    <input class="msg-input"
+      value="{{inputText}}" bindinput="onInput" bindconfirm="send"
+      confirm-type="send" maxlength="200" />
+  </view>
+  </view>
+
+  <!-- 播放队列 -->
+  <queue-panel />
+
+  <!-- "+" 弹出菜单 -->
+  <view class="menu-overlay {{showMenu ? 'show' : ''}}" bindtap="toggleMenu"></view>
+  <view class="menu-panel {{showMenu ? 'show' : ''}}">
+    <text class="menu-title">快捷操作</text>
+    <view class="menu-grid">
+      <view class="menu-item" bindtap="goSearch" data-close="1">
+        <text class="menu-emoji">🔍</text>
+        <text class="menu-label">搜索歌曲</text>
+      </view>
+      <view class="menu-item" bindtap="goFavorites" data-close="1">
+        <text class="menu-emoji">♥</text>
+        <text class="menu-label">我的收藏</text>
+      </view>
+    </view>
+  </view>
+</view>

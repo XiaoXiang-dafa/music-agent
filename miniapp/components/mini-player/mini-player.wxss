@@ -1,0 +1,116 @@
+/* ============================================
+   迷你播放栏 — 微信风格
+   位于输入栏上方，像微信 chat 内的音乐小程序卡片
+   ============================================ */
+
+.mini-player {
+  display: flex; align-items: center; gap: 10rpx;
+  padding: 0 var(--space-2);
+  padding-bottom: calc(0 + env(safe-area-inset-bottom));
+  background: var(--color-surface); flex-shrink: 0;
+  border-bottom: 0.5px solid var(--color-border-light);
+  position: relative;
+  width: 100%; max-width: 100vw; box-sizing: border-box;
+}
+
+/* 顶部进度条 */
+.mini-progress {
+  position: absolute; top: 0; left: 0; height: 3rpx;
+  background: var(--color-accent); border-radius: 0;
+  transition: width 0.3s;
+}
+
+/* 封面 */
+.mini-cover {
+  width: 64rpx; height: 64rpx; border-radius: 6rpx;
+  background: var(--color-bg); flex-shrink: 0;
+}
+
+/* 歌曲信息 */
+.mini-info { flex: 1; min-width: 0; overflow: hidden; }
+.mini-name {
+  font-size: 24rpx; color: var(--color-text); display: block;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.mini-artist {
+  font-size: 22rpx; color: var(--color-text-secondary);
+  display: block; margin-top: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* 按钮 */
+.mini-fav {
+  width: 50rpx; height: 50rpx; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28rpx; color: var(--color-text-secondary);
+}
+.mini-fav.faved { color: var(--color-danger); }
+.mini-ctrl {
+  width: 50rpx; height: 50rpx; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ===== 几何图形图标 ===== */
+
+/* 上一首/下一首 容器 */
+.icon-skip-back, .icon-skip-forward {
+  display: flex; align-items: center; gap: 3rpx;
+}
+
+/* 竖线 */
+.geo-bar-v {
+  width: 4rpx; height: 20rpx;
+  background: var(--color-text);
+  border-radius: 2rpx;
+}
+
+/* 左三角 */
+.geo-tri-left {
+  width: 0; height: 0;
+  border-top: 10rpx solid transparent;
+  border-bottom: 10rpx solid transparent;
+  border-right: 16rpx solid var(--color-text);
+}
+
+/* 右三角 */
+.geo-tri-right {
+  width: 0; height: 0;
+  border-top: 10rpx solid transparent;
+  border-bottom: 10rpx solid transparent;
+  border-left: 16rpx solid var(--color-text);
+}
+
+/* 播放三角 */
+.icon-play {
+  display: flex; align-items: center; justify-content: center;
+}
+.geo-tri-play {
+  width: 0; height: 0;
+  border-top: 14rpx solid transparent;
+  border-bottom: 14rpx solid transparent;
+  border-left: 24rpx solid var(--color-text);
+  margin-left: 6rpx;
+}
+
+/* 暂停双竖线 */
+.icon-pause {
+  display: flex; align-items: center; justify-content: center;
+  gap: 8rpx;
+}
+.geo-bar-pause {
+  width: 8rpx; height: 26rpx;
+  background: var(--color-text);
+  border-radius: 2rpx;
+}
+
+/* 汉堡菜单 */
+.icon-hamburger {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 5rpx;
+}
+.geo-bar-h {
+  width: 24rpx; height: 3rpx;
+  background: var(--color-text);
+  border-radius: 2rpx;
+}

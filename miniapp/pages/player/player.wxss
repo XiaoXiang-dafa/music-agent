@@ -1,0 +1,240 @@
+/* ============================================
+   播放器页 — QQ音乐/Apple Music 风格
+   深色沉浸式 · 大封面卡片 · 声波纹 · 极简控件
+   ============================================ */
+
+.container {
+  height: 100vh; position: relative; overflow: hidden;
+  display: flex; flex-direction: column;
+  padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
+}
+
+/* ===== 动态背景 ===== */
+.player-bg {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 0; pointer-events: none;
+  transition: background 1s var(--ease-out);
+}
+
+/* ===== 导航栏 ===== */
+.nav-bar {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 10;
+  display: flex; align-items: center;
+  padding-left: var(--space-4); padding-right: var(--space-4); padding-bottom: var(--space-2);
+}
+.back-btn {
+  width: var(--touch-sm); height: var(--touch-sm); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+.back-btn:active { background: rgba(255,255,255,0.08); }
+.back-btn text { font-size: 40rpx; color: #fff; font-weight: 300; }
+.nav-title {
+  flex: 1; text-align: center; font-size: var(--text-md); color: #fff;
+  font-weight: 500; margin-right: var(--touch-sm);
+}
+
+/* ===== 唱片封面 + 歌曲信息 ===== */
+.cover-section {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column;
+  flex: 1; min-height: 0;
+}
+.cover-card-wrap {
+  flex: 1; min-height: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.cover-card {
+  width: 580rpx; height: 580rpx; border-radius: 50%;
+  position: relative;
+  box-shadow:
+    0 32rpx 80rpx rgba(0,0,0,0.5),
+    0 8rpx 24rpx rgba(0,0,0,0.3),
+    inset 0 0 0 12rpx rgba(255,255,255,0.03);
+  transition: box-shadow 0.5s;
+}
+.cover-card.spinning-slow {
+  animation: vinylSpin 12s linear infinite;
+}
+@keyframes vinylSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.cover-img {
+  width: 100%; height: 100%; border-radius: 50%; display: block;
+}
+
+/* 唱片中心圆孔 */
+.cover-hole {
+  position: absolute; top: 50%; left: 50%;
+  width: 80rpx; height: 80rpx; border-radius: 50%;
+  background: #080808;
+  transform: translate(-50%, -50%);
+  box-shadow: inset 0 2rpx 8rpx rgba(0,0,0,0.6), 0 0 0 8rpx rgba(255,255,255,0.04);
+  z-index: 2;
+}
+/* 唱片纹理环 */
+.cover-hole::after {
+  content: '';
+  position: absolute; top: 50%; left: 50%;
+  width: 120rpx; height: 120rpx; border-radius: 50%;
+  border: 1rpx solid rgba(255,255,255,0.06);
+  transform: translate(-50%, -50%);
+}
+
+/* ===== 歌曲信息 ===== */
+.song-info-row {
+  position: relative; z-index: 1;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48rpx;
+}
+.song-info-row .song-name {
+  font-size: 48rpx; font-weight: 700; color: #fff;
+  flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.fav-btn-inline {
+  font-size: 44rpx; color: rgba(255,255,255,0.35);
+  padding: 8rpx; flex-shrink: 0; margin-left: 16rpx;
+  transition: transform var(--duration-fast);
+}
+.fav-btn-inline:active { transform: scale(1.2); }
+.fav-btn-inline.faved { color: #FA5151; }
+
+.song-artist {
+  position: relative; z-index: 1;
+  font-size: 30rpx; color: rgba(255,255,255,0.5);
+  text-align: left; padding: 0 48rpx; margin-top: 16rpx;
+}
+
+/* ===== 声波可视化 ===== */
+.visualizer {
+  position: relative; z-index: 1;
+  display: flex; align-items: flex-end; justify-content: center;
+  gap: 8rpx; height: 64rpx;
+  margin-top: 24rpx;
+  padding: 0 80rpx;
+  flex-shrink: 0;
+}
+.wave-bar {
+  flex: 1; max-width: 12rpx; min-width: 6rpx;
+  border-radius: 6rpx;
+  background: rgba(255,255,255,0.25);
+  transition: height 0.35s var(--ease-out);
+}
+.wave-bar.active { background: rgba(255,255,255,0.7); }
+
+/* ===== 进度条 ===== */
+.progress-section {
+  position: relative; z-index: 1;
+  display: flex; align-items: center; gap: var(--space-2);
+  margin-top: 24rpx;
+  padding: 0 48rpx;
+  flex-shrink: 0;
+}
+.time-current, .time-total {
+  font-size: var(--text-xs); color: rgba(255,255,255,0.4);
+  width: 80rpx; text-align: center; font-variant-numeric: tabular-nums;
+}
+.progress-slider { flex: 1; }
+
+/* ===== 播放控制 ===== */
+.controls-section {
+  position: relative; z-index: 1;
+  display: flex; align-items: center; justify-content: center;
+  gap: var(--space-5);
+  margin-top: auto;
+  padding-bottom: calc(30rpx + env(safe-area-inset-bottom));
+}
+.controls-section .ctrl-btn {
+  width: var(--touch-min); height: var(--touch-min);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0.7;
+}
+.controls-section .ctrl-btn:active { opacity: 0.4; }
+.mode-text { font-size: 36rpx; color: #fff; }
+
+/* 播放按钮 */
+.play-btn {
+  width: 120rpx; height: 120rpx; border-radius: 50%;
+  background: transparent;
+  border: 4rpx solid rgba(255,255,255,0.8);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 8rpx 32rpx rgba(0,0,0,0.3);
+  transition: transform var(--duration-fast);
+}
+.play-btn:active { transform: scale(0.93); }
+
+/* 播放三角 */
+.icon-play {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; height: 100%;
+}
+.geo-triangle-play {
+  width: 0; height: 0;
+  border-top: 18rpx solid transparent;
+  border-bottom: 18rpx solid transparent;
+  border-left: 30rpx solid #fff;
+  margin-left: 8rpx;
+}
+
+/* 暂停双竖线 */
+.icon-pause {
+  display: flex; align-items: center; justify-content: center;
+  gap: 10rpx;
+}
+.geo-bar-pause {
+  width: 10rpx; height: 34rpx;
+  background: #fff;
+  border-radius: 3rpx;
+}
+
+/* 上一首 / 下一首 */
+.icon-skip-back, .icon-skip-forward {
+  display: flex; align-items: center; gap: 5rpx;
+}
+.geo-bar-v {
+  width: 5rpx; height: 24rpx;
+  background: #fff;
+  border-radius: 2rpx;
+}
+.geo-triangle-left {
+  width: 0; height: 0;
+  border-top: 12rpx solid transparent;
+  border-bottom: 12rpx solid transparent;
+  border-right: 20rpx solid #fff;
+}
+.geo-triangle-right {
+  width: 0; height: 0;
+  border-top: 12rpx solid transparent;
+  border-bottom: 12rpx solid transparent;
+  border-left: 20rpx solid #fff;
+}
+
+/* 队列汉堡菜单 */
+.icon-hamburger {
+  display: flex; flex-direction: column; gap: 6rpx;
+  align-items: center; justify-content: center;
+}
+.geo-bar-h {
+  width: 30rpx; height: 4rpx;
+  background: #fff;
+  border-radius: 2rpx;
+}
+
+/* ===== 歌曲元信息容器（整体上移） ===== */
+.song-meta {
+  position: relative; z-index: 1;
+  transform: translateY(-100rpx);
+}
+
+/* ===== 单行歌词 ===== */
+.single-lyric {
+  position: relative; z-index: 1;
+  text-align: left; padding: 0 48rpx;
+  margin-top: 28rpx; height: 36rpx;
+  display: flex; align-items: center;
+}
+.single-lyric-text {
+  font-size: 32rpx; color: rgba(255,255,255,0.55);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 100%;
+}

@@ -1,0 +1,54 @@
+<view class="mini-player" wx:if="{{song && song.name}}" bindtap="goPlayer">
+  <!-- 进度条 -->
+  <view class="mini-progress" style="width: {{progress}}%"></view>
+
+  <!-- 封面 -->
+  <image class="mini-cover" src="{{song.cover || '/images/default-cover.png'}}" mode="aspectFill" binderror="onCoverError" />
+
+  <!-- 歌曲信息 -->
+  <view class="mini-info">
+    <text class="mini-name">{{song.name}}</text>
+    <text class="mini-artist">{{song.artist || ''}}</text>
+  </view>
+
+  <!-- 收藏 -->
+  <view class="mini-fav {{isFavorite ? 'faved' : ''}}" catchtap="toggleFav">
+    <text>{{isFavorite ? '♥' : '♡'}}</text>
+  </view>
+
+  <!-- 上一首 -->
+  <view class="mini-ctrl" catchtap="prev">
+    <view class="icon-skip-back">
+      <view class="geo-tri-left"></view>
+      <view class="geo-bar-v"></view>
+    </view>
+  </view>
+
+  <!-- 播放/暂停 -->
+  <view class="mini-ctrl" catchtap="togglePlay">
+    <view wx:if="{{isPlaying}}" class="icon-pause">
+      <view class="geo-bar-pause"></view>
+      <view class="geo-bar-pause"></view>
+    </view>
+    <view wx:else class="icon-play">
+      <view class="geo-tri-play"></view>
+    </view>
+  </view>
+
+  <!-- 下一首 -->
+  <view class="mini-ctrl" catchtap="next">
+    <view class="icon-skip-forward">
+      <view class="geo-bar-v"></view>
+      <view class="geo-tri-right"></view>
+    </view>
+  </view>
+
+  <!-- 播放队列 -->
+  <view class="mini-ctrl" catchtap="goQueue">
+    <view class="icon-hamburger">
+      <view class="geo-bar-h"></view>
+      <view class="geo-bar-h"></view>
+      <view class="geo-bar-h"></view>
+    </view>
+  </view>
+</view>

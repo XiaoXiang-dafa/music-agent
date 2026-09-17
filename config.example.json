@@ -1,0 +1,27 @@
+{
+  "qqmusic": {
+    "cookie": "请设置环境变量 QQMUSIC_COOKIE"
+  },
+  "deepseek": {
+    "api_key": "请设置环境变量 DEEPSEEK_API_KEY",
+    "api_base": "https://api.deepseek.com",
+    "model": "deepseek-chat"
+  },
+  "personality": {
+    "my_name": "音乐助手",
+    "partner_name": "",
+    "relationship": "",
+    "chat_history_file": ""
+  },
+  "schedule": {
+    "morning_time": "07:00",
+    "night_time": "00:00",
+    "weather_city": "auto"
+  },
+  "weather": {
+    "api_key": "请设置环境变量 WEATHER_API_KEY"
+  },
+  "anniversaries": [],
+  "reply_mode": "auto",
+  "log_level": "INFO"
+}

@@ -1,0 +1,9 @@
+-e ./packages/agent-core
+flask>=3.0
+openai>=1.0
+requests>=2.28
+pillow>=10.0
+qqmusic-api-python>=0.6.5
+apscheduler>=3.10
+jieba>=0.42
+gunicorn>=22.0

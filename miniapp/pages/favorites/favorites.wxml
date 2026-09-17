@@ -1,0 +1,65 @@
+<page-meta page-style="{{_scrollLock ? 'overflow: hidden;' : ''}}"></page-meta>
+<view class="container">
+  <!-- Tab 切换 -->
+  <view class="tab-bar">
+    <view class="tab-item {{currentTab === 'fav' ? 'active' : ''}}" data-tab="fav" bindtap="switchTab">
+      <text>♥ 收藏 ({{favorites.length}})</text>
+    </view>
+    <view class="tab-item {{currentTab === 'history' ? 'active' : ''}}" data-tab="history" bindtap="switchTab">
+      <text>🕐 最近播放</text>
+    </view>
+  </view>
+
+  <!-- 收藏列表 -->
+  <scroll-view class="list-area" scroll-y wx:if="{{currentTab === 'fav'}}">
+    <view class="empty-wrap" wx:if="{{favorites.length === 0}}">
+      <text class="empty-icon">💜</text>
+      <text class="empty-text">还没有收藏歌曲</text>
+      <text class="empty-hint">去搜索页收藏喜欢的歌吧</text>
+    </view>
+
+    <view class="song-item" wx:for="{{favorites}}" wx:key="id">
+      <image class="song-cover" src="{{item.cover || '/images/default-cover.png'}}" mode="aspectFill" binderror="onCoverError" data-index="{{index}}" data-tab="{{currentTab}}" />
+      <view class="song-info" data-id="{{item.id}}" data-name="{{item.name}}" data-artist="{{item.artist}}" data-cover="{{item.cover}}" bindtap="playSong">
+        <text class="song-name">{{item.name}}</text>
+        <text class="song-artist">{{item.artist || '未知歌手'}}</text>
+      </view>
+      <view class="song-ops">
+        <text class="op-btn" data-id="{{item.id}}" data-name="{{item.name}}" data-artist="{{item.artist}}" data-cover="{{item.cover}}" bindtap="addToQueue">+</text>
+        <text class="op-btn fav-btn" data-id="{{item.id}}" bindtap="removeFav">♥</text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 播放历史 -->
+  <scroll-view class="list-area" scroll-y wx:if="{{currentTab === 'history'}}">
+    <view class="history-header" wx:if="{{playHistory.length > 0}}">
+      <text class="clear-btn" bindtap="clearHistory">清空记录</text>
+    </view>
+
+    <view class="empty-wrap" wx:if="{{playHistory.length === 0}}">
+      <text class="empty-icon">🎵</text>
+      <text class="empty-text">还没有播放记录</text>
+      <text class="empty-hint">听过的歌会出现在这里</text>
+    </view>
+
+    <view class="song-item" wx:for="{{playHistory}}" wx:key="id">
+      <image class="song-cover" src="{{item.cover || '/images/default-cover.png'}}" mode="aspectFill" binderror="onCoverError" data-index="{{index}}" data-tab="{{currentTab}}" />
+      <view class="song-info" data-id="{{item.id}}" data-name="{{item.name}}" data-artist="{{item.artist}}" data-cover="{{item.cover}}" bindtap="playSong">
+        <text class="song-name">{{item.name}}</text>
+        <text class="song-artist">{{item.artist || '未知歌手'}}</text>
+      </view>
+      <view class="song-ops">
+        <text class="op-btn" data-id="{{item.id}}" data-name="{{item.name}}" data-artist="{{item.artist}}" data-cover="{{item.cover}}" bindtap="addToQueue">+</text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 迷你播放栏（收藏页放大版） -->
+  <view class="bottom-area bottom-area-large">
+    <mini-player />
+  </view>
+
+  <!-- 播放队列 -->
+  <queue-panel />
+</view>

@@ -1,0 +1,76 @@
+/* ============================================
+   微信聊天风格设计系统
+   模仿原生微信聊天界面 — 浅色 · 干净 · 无割裂感
+   ============================================ */
+
+page {
+  /* 色彩 — 微信风格 */
+  --color-bg: #EDEDED;                    /* 聊天背景灰（微信经典） */
+  --color-surface: #FFFFFF;               /* 卡片/气泡白 */
+  --color-surface-hover: #F2F2F2;        /* 按压态 */
+  --color-border: #E0E0E0;               /* 分割线 */
+  --color-border-light: #F0F0F0;
+
+  --color-text: #1A1A1A;                 /* 主文字 */
+  --color-text-secondary: #888888;        /* 辅助文字 */
+  --color-text-muted: #B0B0B0;           /* 弱化文字 */
+
+  --color-bubble-sent: #95EC69;           /* 发送气泡绿（微信经典） */
+  --color-bubble-received: #FFFFFF;       /* 接收气泡白 */
+
+  --color-accent: #07C160;               /* 微信品牌绿 */
+  --color-accent-light: rgba(7,193,96,0.08);
+  --color-accent-active: rgba(7,193,96,0.15);
+  --color-danger: #FA5151;               /* 微信红 */
+  --color-danger-light: rgba(250,81,81,0.08);
+
+  --color-navbar: #EDEDED;               /* 导航栏背景 */
+  --color-input-bar: #F7F7F7;            /* 输入栏背景 */
+
+  /* 字号 */
+  --text-xs: 22rpx;
+  --text-sm: 24rpx;
+  --text-base: 28rpx;
+  --text-md: 32rpx;
+  --text-lg: 36rpx;
+  --text-xl: 44rpx;
+
+  /* 间距（8rpx 网格） */
+  --space-1: 8rpx;
+  --space-2: 16rpx;
+  --space-3: 24rpx;
+  --space-4: 32rpx;
+  --space-5: 40rpx;
+  --space-6: 48rpx;
+
+  /* 圆角 — 微信风格偏小圆角 */
+  --radius-sm: 4rpx;
+  --radius-md: 8rpx;
+  --radius-lg: 12rpx;
+  --radius-bubble: 12rpx;                 /* 气泡圆角 */
+  --radius-full: 9999rpx;
+
+  /* 触摸目标 */
+  --touch-min: 88rpx;
+  --touch-sm: 72rpx;
+
+  /* 动效 */
+  --ease-out: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+
+  /* 阴影 — 微信几乎不用阴影，用细微边框代替 */
+  --shadow-card: 0 2rpx 8rpx rgba(0,0,0,0.04);
+
+  /* 应用 */
+  height: 100%;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
+  font-size: var(--text-base);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+input::placeholder { color: var(--color-text-muted); }
+::-webkit-scrollbar { width: 0; height: 0; }

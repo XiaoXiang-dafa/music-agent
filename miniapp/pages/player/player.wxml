@@ -1,0 +1,93 @@
+<page-meta page-style="{{_scrollLock ? 'overflow: hidden;' : ''}}"></page-meta>
+<!-- 播放页 — QQ音乐/Apple Music 风格 -->
+<view class="container">
+
+  <!-- 动态背景 -->
+  <view class="player-bg" style="background: {{themeBg}}"></view>
+
+  <!-- ====== 导航栏 ====== -->
+  <view class="nav-bar" style="padding-top: {{statusBarHeight + 10}}px;">
+    <view class="back-btn" bindtap="goBack"><text>←</text></view>
+    <text class="nav-title">正在播放</text>
+  </view>
+
+  <!-- ====== 唱片封面 + 歌曲信息 ====== -->
+  <view class="cover-section" bindtouchstart="onTouchStart" bindtouchend="onTouchEnd">
+    <view class="cover-card-wrap">
+      <view class="cover-card {{isPlaying ? 'spinning-slow' : ''}}">
+      <image class="cover-img" src="{{song.cover || '/images/default-cover.png'}}" mode="aspectFill" binderror="onCoverError" />
+      <view class="cover-hole"></view>
+    </view>
+    </view>
+
+    <!-- 歌名 + 歌手 + 歌词 整体上移 -->
+    <view class="song-meta">
+      <view class="song-info-row">
+        <text class="song-name">{{song.name || '未在播放'}}</text>
+        <text class="fav-btn-inline {{isFavorite ? 'faved' : ''}}" bindtap="toggleFavorite">{{isFavorite ? '♥' : '♡'}}</text>
+      </view>
+      <text class="song-artist">{{song.artist || ''}}</text>
+
+      <view class="single-lyric" wx:if="{{currentLyricText}}">
+        <text class="single-lyric-text">{{currentLyricText}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ====== 声波可视化 ====== -->
+  <view class="visualizer">
+    <view
+      wx:for="{{waveBars}}"
+      wx:key="index"
+      class="wave-bar {{item.active ? 'active' : ''}}"
+      style="height: {{item.height}}rpx;"
+    ></view>
+  </view>
+
+  <!-- ====== 进度条 ====== -->
+  <view class="progress-section">
+    <text class="time-current">{{currentTimeText}}</text>
+    <slider class="progress-slider" value="{{progress}}" max="100" block-size="14"
+      activeColor="#ffffff" backgroundColor="rgba(255,255,255,0.12)"
+      bindchange="onSeek" />
+    <text class="time-total">{{durationText}}</text>
+  </view>
+
+  <!-- ====== 播放控制 ====== -->
+  <view class="controls-section">
+    <view class="ctrl-btn" bindtap="cycleMode">
+      <text class="mode-text">{{modeIcon}}</text>
+    </view>
+    <view class="ctrl-btn" bindtap="prev">
+      <view class="icon-skip-back">
+        <view class="geo-triangle-left"></view>
+        <view class="geo-bar-v"></view>
+      </view>
+    </view>
+    <view class="play-btn" bindtap="togglePlay">
+      <view wx:if="{{isPlaying}}" class="icon-pause">
+        <view class="geo-bar-pause"></view>
+        <view class="geo-bar-pause"></view>
+      </view>
+      <view wx:else class="icon-play">
+        <view class="geo-triangle-play"></view>
+      </view>
+    </view>
+    <view class="ctrl-btn" bindtap="next">
+      <view class="icon-skip-forward">
+        <view class="geo-bar-v"></view>
+        <view class="geo-triangle-right"></view>
+      </view>
+    </view>
+    <view class="ctrl-btn" bindtap="showQueue">
+      <view class="icon-hamburger">
+        <view class="geo-bar-h"></view>
+        <view class="geo-bar-h"></view>
+        <view class="geo-bar-h"></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 播放队列 -->
+  <queue-panel />
+</view>
