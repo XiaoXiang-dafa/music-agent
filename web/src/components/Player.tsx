@@ -4,31 +4,54 @@ export interface Song {
   name: string
   artist: string
   url: string
+  cover?: string
+  source?: string
 }
 
-/** 音频播放器：收到 Agent 的 play_song 结果后自动播放。 */
 export default function Player({ song }: { song: Song | null }) {
-  const ref = useRef<HTMLAudioElement>(null)
+  const audioRef = useRef<HTMLAudioElement>(null)
 
   useEffect(() => {
-    if (song && ref.current) {
-      ref.current.load()
-      ref.current.play().catch(() => {})
-    }
+    if (!song || !audioRef.current) return
+    audioRef.current.load()
+    audioRef.current.play().catch(() => {
+      // 浏览器可能阻止自动播放，原生播放键仍可正常使用。
+    })
   }, [song])
 
-  if (!song) return null
-
   return (
-    <div className="player">
-      <div className="player-info">
-        <span className="player-icon">▶️</span>
-        <div>
-          <div className="player-song">{song.name}</div>
-          <div className="player-artist">{song.artist || '未知歌手'}</div>
+    <div className={song ? 'player has-song' : 'player'}>
+      <div className="record-stage" aria-hidden="true">
+        <div className="record">
+          <div className="record-ring ring-one" />
+          <div className="record-ring ring-two" />
+          <div className="record-label">
+            {song?.cover ? <img src={song.cover} alt="" /> : null}
+          </div>
         </div>
+        <div className="tonearm"><i /></div>
       </div>
-      <audio ref={ref} controls autoPlay className="player-audio" src={song.url} />
+
+      <div className="track-copy">
+        <p className="track-status">{song ? '正在播放' : '等待点歌'}</p>
+        <h2>{song?.name ?? '把此刻交给音乐'}</h2>
+        <p>{song?.artist || '说出一首歌，或描述你的心情'}</p>
+      </div>
+
+      {song ? (
+        <audio
+          ref={audioRef}
+          className="native-player"
+          controls
+          preload="metadata"
+          src={song.url}
+          aria-label={`播放 ${song.name} - ${song.artist || '未知歌手'}`}
+        />
+      ) : (
+        <div className="player-placeholder" aria-hidden="true">
+          <span /><span /><span /><span /><span />
+        </div>
+      )}
     </div>
   )
 }

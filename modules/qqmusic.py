@@ -12,6 +12,13 @@ from qqmusic_api.modules.song import SongFileType, SongFileInfo
 _client = None  # 每次请求新建，避免事件循环冲突
 
 
+def _https(url: str) -> str:
+    """播放器只接收 HTTPS 音源，避免被浏览器混合内容策略拦截。"""
+    if url and url.startswith("http://"):
+        return "https://" + url[len("http://"):]
+    return url
+
+
 def _get_client():
     """每次调用创建新 Client"""
     return Client()
@@ -228,12 +235,12 @@ async def _song_url_async(mid: str) -> str:
                     path = item.wifiurl or item.flowurl or item.purl
                     if path:
                         if path.startswith("http"):
-                            return path
+                            return _https(path)
                         # QQ 音乐 CDN 域名
                         for domain in [
-                            "http://ws.stream.qqmusic.qq.com/",
-                            "http://dl.stream.qqmusic.qq.com/",
-                            "http://isure.stream.qqmusic.qq.com/",
+                            "https://ws.stream.qqmusic.qq.com/",
+                            "https://dl.stream.qqmusic.qq.com/",
+                            "https://isure.stream.qqmusic.qq.com/",
                         ]:
                             test_url = domain + path
                             # 简单检查是否可访问（HEAD 请求）

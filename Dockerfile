@@ -1,3 +1,12 @@
+FROM node:22-alpine AS web-builder
+
+WORKDIR /web
+COPY web/package.json web/package-lock.json ./
+RUN npm ci
+COPY web/ ./
+RUN npm run build
+
+
 FROM python:3.12-slim
 
 WORKDIR /app
@@ -14,6 +23,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # 复制应用代码
 COPY . .
+COPY --from=web-builder /web/dist ./web/dist
 
 # CloudBase 云托管使用 PORT 环境变量
 EXPOSE 80

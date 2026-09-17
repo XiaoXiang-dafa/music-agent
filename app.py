@@ -13,9 +13,10 @@ os.environ.setdefault('PYTHONIOENCODING', 'utf-8')
 from datetime import datetime
 from time import monotonic, perf_counter_ns
 from urllib.parse import urlsplit
-from flask import Flask, render_template, request, jsonify, send_from_directory, Response
+from flask import Flask, request, jsonify, send_from_directory, Response
 
 BOT_DIR = os.path.dirname(os.path.abspath(__file__))
+WEB_DIST_DIR = os.path.join(BOT_DIR, "web", "dist")
 sys.path.insert(0, os.path.join(BOT_DIR, "modules"))
 
 from openai import OpenAI
@@ -75,7 +76,7 @@ def set_utf8_charset(resp):
     resp.headers["Content-Security-Policy"] = (
         "default-src 'self'; img-src 'self' data: https:; "
         "media-src 'self' data: https:; connect-src 'self'; "
-        "style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'"
+        "style-src 'self'; script-src 'self'"
     )
     return resp
 
@@ -249,9 +250,22 @@ def init():
 def static_files(filename):
     return send_from_directory(os.path.join(BOT_DIR, "static"), filename)
 
+
+@app.route("/assets/<path:filename>")
+def web_assets(filename):
+    return send_from_directory(os.path.join(WEB_DIST_DIR, "assets"), filename)
+
+
 @app.route("/")
 def index():
-    return render_template("index.html")
+    index_file = os.path.join(WEB_DIST_DIR, "index.html")
+    if not os.path.isfile(index_file):
+        return Response(
+            "前端尚未构建，请先运行：cd web && npm run build",
+            status=503,
+            mimetype="text/plain",
+        )
+    return send_from_directory(WEB_DIST_DIR, "index.html")
 
 
 @app.route("/api/status")
@@ -560,7 +574,11 @@ def api_search():
     q = request.args.get("q", "").strip()
     if not q:
         return jsonify({"songs": []})
-    limit = int(request.args.get("limit", 15))
+    if len(q) > 200:
+        return jsonify({"error": "query too long", "songs": []}), 400
+    limit = _search_limit()
+    if limit is None:
+        return jsonify({"error": "invalid limit", "songs": []}), 400
     songs = qqmusic_search(q, limit=limit)
     return jsonify({"songs": songs})
 
@@ -585,12 +603,27 @@ def api_lyric():
 
 # ===== 网易云音乐 API =====
 
+
+def _search_limit(default: int = 15, maximum: int = 30):
+    raw = request.args.get("limit", str(default))
+    try:
+        value = int(raw)
+    except (TypeError, ValueError):
+        return None
+    if value < 1:
+        return None
+    return min(value, maximum)
+
 @app.route("/api/search/netease")
 def api_search_netease():
     q = request.args.get("q", "").strip()
     if not q:
         return jsonify({"songs": []})
-    limit = int(request.args.get("limit", 15))
+    if len(q) > 200:
+        return jsonify({"error": "query too long", "songs": []}), 400
+    limit = _search_limit()
+    if limit is None:
+        return jsonify({"error": "invalid limit", "songs": []}), 400
     songs = netease_search(q, limit=limit)
     return jsonify({"songs": songs})
 

@@ -1,30 +1,33 @@
 import { useEffect, useRef, useState } from 'react'
-import { streamChat, type AgentEvent } from './lib/sse'
-import { fetchTools, getSessionId, type ToolInfo } from './lib/api'
-import AgentTrace, { type TraceItem } from './components/AgentTrace'
 import Player, { type Song } from './components/Player'
+import { getSessionId } from './lib/api'
+import { streamChat, type AgentEvent } from './lib/sse'
 
 interface Turn {
   role: 'user' | 'assistant'
   content: string
-  trace: TraceItem[]
 }
 
-const EMPTY_TURN: Turn = { role: 'assistant', content: '', trace: [] }
+const EMPTY_TURN: Turn = { role: 'assistant', content: '' }
+
+const suggestions = [
+  '放一首周杰伦的晴天',
+  '推荐一首适合夜晚的歌',
+  '聊聊最近循环的音乐',
+]
 
 export default function App() {
   const [turns, setTurns] = useState<Turn[]>([])
   const [input, setInput] = useState('')
   const [busy, setBusy] = useState(false)
   const [session] = useState(() => getSessionId())
-  const [tools, setTools] = useState<ToolInfo[]>([])
   const [playing, setPlaying] = useState<Song | null>(null)
   const [now, setNow] = useState<Turn | null>(null)
+  const [lastFailed, setLastFailed] = useState('')
   const nowRef = useRef<Turn | null>(null)
   const endRef = useRef<HTMLDivElement>(null)
 
-  // 流式中的“当前助手回合”用 ref 镜像，避免闭包读到旧值
-  const pushNow = (cb: (t: Turn) => Turn) => {
+  const pushNow = (cb: (turn: Turn) => Turn) => {
     nowRef.current = cb(nowRef.current ?? { ...EMPTY_TURN })
     setNow({ ...nowRef.current })
   }
@@ -33,7 +36,7 @@ export default function App() {
     // React may run this updater after the streaming ref has been cleared.
     const completed = nowRef.current
     if (completed && completed.content) {
-      setTurns((t) => [...t, completed])
+      setTurns((turns) => [...turns, completed])
     }
     nowRef.current = null
     setNow(null)
@@ -41,39 +44,42 @@ export default function App() {
   }
 
   useEffect(() => {
-    fetchTools().then(setTools).catch(console.error)
-  }, [])
-
-  useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: 'smooth' })
+    endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
   }, [turns, now, playing])
 
-  const onEvent = (e: AgentEvent) => {
-    switch (e.event) {
+  const onEvent = (event: AgentEvent) => {
+    switch (event.event) {
       case 'reply_chunk':
-        pushNow((t) => ({ ...t, content: t.content + e.data.content }))
+        pushNow((turn) => ({ ...turn, content: turn.content + event.data.content }))
         break
-      case 'tool_call':
-        pushNow((t) => ({
-          ...t,
-          trace: [...t.trace, { kind: 'call', name: e.data.name, args: e.data.args }],
-        }))
-        break
-      case 'tool_result':
-        pushNow((t) => ({
-          ...t,
-          trace: [...t.trace, { kind: 'result', name: e.data.name, result: e.data.result }],
-        }))
-        if (e.data.name === 'play_song') {
-          const r = e.data.result as Record<string, unknown> & { song?: string; artist?: string; url?: string }
-          if (r?.url) setPlaying({ name: r.song ?? '未知', artist: r.artist ?? '', url: r.url })
+      case 'tool_result': {
+        if (event.data.name !== 'play_song') break
+        const result = event.data.result as {
+          song?: string
+          artist?: string
+          url?: string
+          cover?: string
+          source?: string
+        }
+        if (result?.url) {
+          setPlaying({
+            name: result.song ?? '未知歌曲',
+            artist: result.artist ?? '',
+            url: result.url,
+            cover: result.cover ?? '',
+            source: result.source ?? '',
+          })
         }
         break
+      }
       case 'done':
         commitNow()
         break
       case 'error':
-        pushNow((t) => ({ ...t, content: t.content || '⚠️ 出错了：' + e.data.message }))
+        pushNow((turn) => ({
+          ...turn,
+          content: turn.content || event.data.message || '处理请求时发生错误',
+        }))
         commitNow()
         break
       default:
@@ -81,105 +87,128 @@ export default function App() {
     }
   }
 
-  const send = async () => {
-    const text = input.trim()
+  const send = async (preset?: string) => {
+    const text = (preset ?? input).trim()
     if (!text || busy) return
+
     setInput('')
     setBusy(true)
-    setTurns((t) => [...t, { role: 'user', content: text, trace: [] }])
+    setLastFailed('')
+    setTurns((turns) => [...turns, { role: 'user', content: text }])
     nowRef.current = { ...EMPTY_TURN }
     setNow({ ...EMPTY_TURN })
+
     try {
       await streamChat(text, session, onEvent)
       commitNow()
-    } catch (err) {
-      pushNow((t) => ({ ...t, content: t.content || `⚠️ 请求失败：${String(err)}` }))
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '处理请求时发生错误'
+      setLastFailed(text)
+      pushNow((turn) => ({ ...turn, content: turn.content || message }))
       commitNow()
     }
   }
 
-  const suggestions = [
-    '推荐一首适合晚上听的歌',
-    '我想听周杰伦的晴天',
-    '今天下雨，推荐点应景的歌',
-    '我喜欢民谣，推荐几首',
-  ]
-
   return (
-    <div className="app">
-      <aside className="sidebar">
-        <h1>🎵 音乐 AI 伴侣</h1>
-        <p className="sub">基于 Function Calling 的音乐 Agent</p>
-        <div className="badges">
-          <span>Agent</span>
-          <span>Function Calling</span>
-          <span>SSE 流式</span>
-          <span>记忆</span>
+    <div className="app-shell">
+      <header className="topbar">
+        <a className="brand" href="/" aria-label="音乐伴侣首页">
+          <span className="brand-mark" aria-hidden="true">M</span>
+          <span>音乐伴侣</span>
+        </a>
+        <div className="presence" aria-label="伴侣在线">
+          <span className="presence-dot" aria-hidden="true" />
+          在你身边
         </div>
-        <div className="tools-panel">
-          <h2>Agent 可用工具（{tools.length}）</h2>
-          <ul>
-            {tools.map((t) => (
-              <li key={t.name}>
-                <code>{t.name}</code>
-                <span className="tool-desc">{t.description}</span>
-              </li>
+      </header>
+
+      <main className="workspace">
+        <section className="listening-panel" aria-label="音乐播放器">
+          <p className="eyebrow">NOW PLAYING</p>
+          <Player song={playing} />
+          <div className="listening-note">
+            <span>01</span>
+            <p>一句话点歌，伴侣会替你寻找可播放的原版音源。</p>
+          </div>
+        </section>
+
+        <section className="companion-panel" aria-label="音乐伴侣对话">
+          <div className="conversation-heading">
+            <div>
+              <p className="eyebrow">COMPANION</p>
+              <h1>今天想听什么？</h1>
+            </div>
+            <span className={busy ? 'reply-state is-busy' : 'reply-state'}>
+              {busy ? '正在找音乐' : '随时可以聊'}
+            </span>
+          </div>
+
+          <div className="turns" aria-live="polite" aria-busy={busy}>
+            {turns.length === 0 && !now && (
+              <div className="welcome">
+                <p className="welcome-lead">我是你的音乐伴侣。</p>
+                <p>告诉我歌名、歌手，或者你此刻的心情。</p>
+                <div className="suggestions" aria-label="快捷提问">
+                  {suggestions.map((suggestion, index) => (
+                    <button key={suggestion} onClick={() => void send(suggestion)} disabled={busy}>
+                      <span>0{index + 1}</span>
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {turns.map((turn, index) => (
+              <div key={`${turn.role}-${index}`} className={`turn ${turn.role}`}>
+                <span className="turn-label">{turn.role === 'user' ? '你' : '伴侣'}</span>
+                <div className="bubble">{turn.content}</div>
+              </div>
             ))}
-          </ul>
-        </div>
-        <div className="session-hint">
-          会话 ID：<code>{session}</code>
-        </div>
-      </aside>
 
-      <main className="chat">
-        <Player song={playing} />
-
-        <div className="turns">
-          {turns.map((t, i) => (
-            <div key={i} className={`turn ${t.role}`}>
-              <div className="bubble">{t.content}</div>
-              {t.trace.length > 0 && <AgentTrace trace={t.trace} />}
-            </div>
-          ))}
-
-          {now && (
-            <div className="turn assistant">
-              <div className={`bubble ${now.content ? '' : 'thinking'}`}>
-                {now.content || '思考中…'}
+            {now && (
+              <div className="turn assistant">
+                <span className="turn-label">伴侣</span>
+                <div className={now.content ? 'bubble' : 'bubble thinking'}>
+                  {now.content || (
+                    <span className="thinking-dots" aria-label="正在思考">
+                      <i /><i /><i />
+                    </span>
+                  )}
+                </div>
               </div>
-              {now.trace.length > 0 && <AgentTrace trace={now.trace} />}
-            </div>
+            )}
+            <div ref={endRef} />
+          </div>
+
+          {lastFailed && !busy && (
+            <button className="retry" onClick={() => void send(lastFailed)}>
+              刚才没接上，点这里重试
+            </button>
           )}
 
-          {turns.length === 0 && !now && (
-            <div className="welcome">
-              <p>你好，我是小祥大发 👋</p>
-              <p>试着让我帮你找歌、推荐、或者聊聊音乐吧：</p>
-              <div className="suggestions">
-                {suggestions.map((s) => (
-                  <button key={s} onClick={() => setInput(s)} disabled={busy}>
-                    {s}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-          <div ref={endRef} />
-        </div>
-
-        <div className="input-bar">
-          <input
-            value={input}
-            placeholder="聊聊音乐，或说想听的歌…"
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && send()}
-            disabled={busy}
-          />
-          <button onClick={send} disabled={busy || !input.trim()}>
-            {busy ? '回复中' : '发送'}
-          </button>
-        </div>
+          <form
+            className="composer"
+            onSubmit={(event) => {
+              event.preventDefault()
+              void send()
+            }}
+          >
+            <label className="sr-only" htmlFor="message">给音乐伴侣发消息</label>
+            <input
+              id="message"
+              value={input}
+              placeholder="点歌，或者聊聊音乐…"
+              onChange={(event) => setInput(event.target.value)}
+              disabled={busy}
+              autoComplete="off"
+            />
+            <button type="submit" disabled={busy || !input.trim()} aria-label="发送消息">
+              <span>发送</span>
+              <b aria-hidden="true">↗</b>
+            </button>
+          </form>
+        </section>
       </main>
     </div>
   )

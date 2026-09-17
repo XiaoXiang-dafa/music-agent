@@ -92,15 +92,22 @@ export WEATHER_API_KEY="..."        # 可选，天气功能需要
 python3 app.py
 ```
 
-### 启动后端
+### 本地启动
 ```bash
-# DEEPSEEK_API_KEY="sk-..." python3 app.py
-# 监听 http://127.0.0.1:5050
+cd web
+npm ci
+npm run build
+cd ..
+
+# 使用真实服务
+DEEPSEEK_API_KEY="sk-..." python3 app.py
+# 浏览器打开 http://127.0.0.1:5050
 ```
 
 没有 API Key 时可直接启动离线 Demo：
 
 ```bash
+cd web && npm ci && npm run build && cd ..
 DEMO_MODE=1 python3 app.py
 ```
 
@@ -127,14 +134,14 @@ npm run build
 - 聊天接口有请求体、消息、会话 ID 校验和单进程限流；若要正式多实例部署，仍应在网关层增加鉴权与分布式限流。
 - 开发服务默认只监听 `127.0.0.1`；不要将带真实密钥的本地进程直接暴露到公网。
 
-### 启动 Web 演示端
+### 前端开发模式
 ```bash
 cd web
 npm install            # 或用 --cache 规避 npm cache 权限问题
 npm run dev            # http://127.0.0.1:5173 （/api 已代理到 5050）
 ```
 
-浏览器打开 `http://127.0.0.1:5173`，发「我想听周杰伦的晴天」或「推荐一首适合晚上听的歌」，即可看到 Agent 的工具调用轨迹 + 流式回复 + 真实播放。
+日常使用直接打开 Flask 的 `http://127.0.0.1:5050`。只有开发前端时才需要访问 `http://127.0.0.1:5173`。发「放一首周杰伦的晴天」即可验证流式回复与原生播放器闭环。
 
 ### 微信小程序
 用微信开发者工具打开 `miniapp/`（或项目根，`project.config.json` 已配 `miniprogramRoot`）。`miniapp/app.js` 里 `apiBase` 指向后端。

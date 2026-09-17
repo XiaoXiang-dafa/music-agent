@@ -178,7 +178,7 @@ def song_url(song_id: int) -> str:
             for d in data.get("data", []):
                 url = d.get("url", "")
                 if url:
-                    return url
+                    return _https(url)
         except Exception:
             continue
     return ""

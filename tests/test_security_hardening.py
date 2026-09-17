@@ -4,6 +4,7 @@ from pathlib import Path
 
 import app as app_module
 from PIL import Image
+from modules import netease, qqmusic
 
 
 def test_cover_color_rejects_private_network_urls(monkeypatch):
@@ -116,6 +117,16 @@ def test_responses_include_basic_security_headers():
     assert response.headers["X-Content-Type-Options"] == "nosniff"
     assert response.headers["Referrer-Policy"] == "no-referrer"
     assert "default-src 'self'" in response.headers["Content-Security-Policy"]
+    assert "'unsafe-inline'" not in response.headers["Content-Security-Policy"]
+
+
+def test_music_urls_are_upgraded_to_https():
+    assert qqmusic._https("http://ws.stream.qqmusic.qq.com/song.mp3") == (
+        "https://ws.stream.qqmusic.qq.com/song.mp3"
+    )
+    assert netease._https("http://m10.music.126.net/song.mp3") == (
+        "https://m10.music.126.net/song.mp3"
+    )
 
 
 def test_chat_rate_limit_rejects_bursts(monkeypatch):
